@@ -1,7 +1,9 @@
 package com.cannontm.kaartenbewakertm.apiservice;
 
 import com.cannontm.kaartenbewakertm.track.Track;
+import com.cannontm.kaartenbewakertm.track.TrackService;
 import com.cannontm.kaartenbewakertm.trackrecords.TrackRecord;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
@@ -21,7 +23,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ApiCallService {
+
+    TrackService trackService;
 
     private List<String> queue = new ArrayList<>();
     @Value("${UBI_LOGIN}")
@@ -57,9 +62,9 @@ public class ApiCallService {
         }
         else if(queue.get(0).equals("usernames"))
         {
-
+            String[] details = queue.get(0).split(":");
         }
-
+            queue.remove(0);
 
     }
 
@@ -95,6 +100,7 @@ public class ApiCallService {
 
 
     public List<TrackRecord> getRecords(String trackUid){
+
         URI url = URI.create("https://live-services.trackmania.nadeo.live/api/token/leaderboard/group/Personal_Best/map/" + trackUid +  "/top?length=100&onlyWorld=true&offset=0");
         try {
             return WebClient.create().get()
@@ -108,17 +114,21 @@ public class ApiCallService {
                     .onStatus(HttpStatusCode::is4xxClientError, this::handleErrors)
                     .onStatus(HttpStatusCode::is5xxServerError, this::handleServerErrors)
                     .bodyToMono(MapLBResponse0.class)
-                    .map(MapLBResponse0::tops)
-                    .map(MapLBResponse1::top)
-                    .map(mapLBResponses -> {
+                    .flatMap(mapLBResponse0 -> Mono.just(mapLBResponse0.tops()))
+                    .flatMap(mapLBResponse1 -> Mono.just(mapLBResponse1.top()))
+                    .flatMap(mapLBResponses -> {
                         List<TrackRecord> trList = new ArrayList<>();
-                        for (MapLBResponse responses : mapLBResponses) {
-                            Track track =
+
+                        Mono<Track> track = trackService.getTrackfromUid(trackUid);
+                        for (MapLBResponse response : mapLBResponses) {
                             TrackRecord r = TrackRecord.builder()
-                                    .
+                                    .pos(response.getPosition())
+                                    .score(response.getScore())
+                                    .track(track.block())
+                                    .region(response.getZoneName())
                                     .build();
                         }
-                        return trList;
+                        return Mono.just(trList);
                     })
                     .block();
         }

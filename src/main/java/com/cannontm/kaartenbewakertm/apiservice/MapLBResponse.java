@@ -12,5 +12,6 @@ public class MapLBResponse {
     private String name;
     private Integer position;
     private Integer score;
+    private String zoneName;
 
 }

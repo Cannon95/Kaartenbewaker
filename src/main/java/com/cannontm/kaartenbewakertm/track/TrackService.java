@@ -10,14 +10,15 @@ public class TrackService {
 
     TrackRepository trackRepository;
 
-    public void saveTrack(Track track){
-        if(track != null && !track.uid.equals("")){
-            trackRepository.save(track);
-        }
+    public void saveTrack(Mono<Track> track){
+        track.flatMap(track1 -> trackRepository.save(track1)).subscribe();
     }
 
     public Mono<Track> getTrackfromUid(String uid){
-        Mono<Track> track = trackRepository.findById(uid);
+        return trackRepository.findById(uid).flatMap(track -> {
+            if(track == null)return Mono.empty();
+            else return Mono.just(track);
+        });
 
 
     }

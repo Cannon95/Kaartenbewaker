@@ -4,8 +4,8 @@ import com.cannontm.kaartenbewakertm.player.Player;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
+import com.cannontm.kaartenbewakertm.track.Track;
 
-import javax.sound.midi.Track;
 import java.util.UUID;
 
 @Getter
