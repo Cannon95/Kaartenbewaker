@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: kaartenbewaker
+
+  main:
+    web-application-type: none
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:app}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+
+logging:
+  level:
+    org.springframework: INFO
+
+ubi:
+  username: ${UBI_USERNAME}
+  password: ${UBI_PASSWORD}
+  user-agent: ${UBI_USERAGENT}
+
+discord:
+  token: ${DISCORD_TOKEN}
+  guild-id: ${GUILD_ID}
+  client-id: ${CLIENT_ID}
+
+trackmania:
+  zone-id: ${TM_ZONE_ID:30209d1a-7e13-11e8-8060-e284abfd2bc4}
+  club-id: ${TM_CLUB_ID:95052}
+
+
